@@ -1,0 +1,26 @@
+.NavbarBox {
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.link {
+    color: black;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 24px;
+    transition: color 350ms ease-in-out;
+    position: relative;
+}
+
+.link:hover,
+.link:focus {
+    color: #ff0054;
+}
+
+.link.active {
+    text-decoration: underline #ff0054;
+    color: #ff0054;
+}
