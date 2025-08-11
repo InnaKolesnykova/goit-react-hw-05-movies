@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, Link, useLocation, useNavigate, Route, Routes, Outlet } from 'react-router-dom';
 import styles from './MovieDetails.module.css';
-import { fetchMovieDetails } from '../../components/fetch/fetchMovieDetail';
+import { fetchMovieDetails } from '../../components/fetch/fetchMovieDetails';
 
 const Cast = lazy(() => import('../../components/Cast/Cast'));
 const Reviews = lazy(() => import('../Reviews/Reviews'));
