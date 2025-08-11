@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, Link, useLocation, useNavigate, Route, Routes, Outlet } from 'react-router-dom';
 import styles from './MovieDetails.module.css';
-import { fetchMovieDetails } from '../../components/fetch/fetchMovieDetails';
+import { fetchMovieDetail } from '../../components/fetch/fetchMovieDetail';
 
 const Cast = lazy(() => import('../../components/Cast/Cast'));
 const Reviews = lazy(() => import('../Reviews/Reviews'));
@@ -16,7 +16,7 @@ const MovieDetails = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const data = await fetchMovieDetails(movieId);
+        const data = await fetchMovieDetail(movieId);
         setMovieDetails(data);
       } catch (error) {
         console.error('Error fetching movie details:', error);
