@@ -4,7 +4,7 @@ import styles from './MovieDetails.module.css';
 import { fetchMovieDetail } from '../../fetch/fetchMovieDetail';
 
 
-const Cast = lazy(() => import('../../components/Cast/Cast'));
+const Cast = lazy(() => import('../../Cast/Cast'));
 const Reviews = lazy(() => import('../Reviews/Reviews'));
 
 const MovieDetails = () => {
