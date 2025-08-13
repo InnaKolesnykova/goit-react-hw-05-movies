@@ -1,6 +1,6 @@
 import styles from './Home.module.css';
 import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import MoviesList from '../components/MoviesList/MoviesList';
 
 const Home = () => {
     const [movies, setMovies] = useState([]);
@@ -22,7 +22,6 @@ const Home = () => {
             });
     }, [apiUrlTrend]);
 
-
     useEffect(() => {
         getTrendMovie();
     }, [getTrendMovie]);
@@ -30,19 +29,7 @@ const Home = () => {
     return (
         <div className={styles.HomeBox}>
             <h1 className={styles.title}>Trending today</h1>  
-            {movies.length > 0 && (
-                <ul className={styles.list}>
-                    {movies.map((movie) => (
-                        <li className={styles.item} key={movie.id}>
-                            {movie.title && (
-                                <Link className={styles.link} to={{ pathname: `/movies/${movie.id}`, state: { from: 'home' } }}>
-                                    {movie.title}
-                                </Link>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            )}
+            {movies.length > 0 && <MoviesList movies={movies} fromPage="home" />}
         </div>
     );
 };

@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styles from './Movies.module.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import MoviesList from '../components/MoviesList/MoviesList';
 
 const Movies = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState(() => {
-    // Load from sessionStorage when the component mounts
     const storedMovies = sessionStorage.getItem('movies');
     return storedMovies ? JSON.parse(storedMovies) : [];
   });
@@ -25,8 +25,6 @@ const Movies = () => {
       if (response.ok) {
         setMovies(json.results);
         setError(null);
-
-        // Save to sessionStorage after fetching results
         sessionStorage.setItem('movies', JSON.stringify(json.results));
       } else {
         setError('Failed to fetch search results');
@@ -42,28 +40,23 @@ const Movies = () => {
   }, [api_key]);
 
   useEffect(() => {
-    // Load from sessionStorage when the component mounts
     const storedMovies = sessionStorage.getItem('movies');
     const queryParam = new URLSearchParams(window.location.search).get('query');
 
     if (!queryParam) {
-      // Clear sessionStorage if there is no query parameter in the URL
       sessionStorage.removeItem('movies');
     } else if (storedMovies) {
       setMovies(JSON.parse(storedMovies));
     }
   }, []);
 
-  const handleChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  const handleChange = (e) => setSearchQuery(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (searchQuery.trim() !== '') {
       try {
         localStorage.setItem('searchQuery', searchQuery);
-
         await fetchSearchResults(searchQuery);
         navigate(`/movies?query=${searchQuery}`);
       } catch (error) {
@@ -87,19 +80,7 @@ const Movies = () => {
       </form>
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
-      {movies.length > 0 && (
-        <ul className={styles.searchResults}>
-          {movies.map((movie) => (
-            <li className={styles.item} key={movie.id}>
-              {movie.original_title && (
-                <Link className={styles.link} to={`/movies/${movie.id}`}>
-                  {movie.original_title}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+      {movies.length > 0 && <MoviesList movies={movies} fromPage="movies" />}
     </div>
   );
 };
