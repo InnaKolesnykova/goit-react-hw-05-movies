@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styles from './Movies.module.css';
 import { useNavigate } from 'react-router-dom';
-import MoviesList from '../../components/MoviesList/MoviesList';
+import MoviesList from '../MoviesList/MoviesList';
 
 const Movies = () => {
   const [searchQuery, setSearchQuery] = useState('');

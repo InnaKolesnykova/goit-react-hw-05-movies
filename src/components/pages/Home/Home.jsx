@@ -1,6 +1,6 @@
 import styles from './Home.module.css';
 import { useEffect, useState, useCallback } from 'react';
-import MoviesList from '../../components/MoviesList/MoviesList';
+import MoviesList from '../../MoviesList/MoviesList';
 
 const Home = () => {
     const [movies, setMovies] = useState([]);
