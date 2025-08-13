@@ -1,97 +1,88 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { useParams, Link, useLocation, useNavigate, Route, Routes, Outlet } from 'react-router-dom';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useParams, Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styles from './MovieDetails.module.css';
-import { fetchMovieDetail } from '../../fetch/fetchMovieDetail';
-
-
-const Cast = lazy(() => import('../../Cast/Cast'));
-const Reviews = lazy(() => import('../Reviews/Reviews'));
 
 const MovieDetails = () => {
-  const [movieDetails, setMovieDetails] = useState(null);
-  const [subPageVisits, setSubPageVisits] = useState(0); 
   const { movieId } = useParams();
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const api_key = '6ec0ba8fa041ffdfd513a6b00a854a64';
 
   useEffect(() => {
-    const fetchDetails = async () => {
+    const fetchMovieDetails = async () => {
+      setLoading(true);
       try {
-        const data = await fetchMovieDetail(movieId);
-        setMovieDetails(data);
-      } catch (error) {
-        console.error('Error fetching movie details:', error);
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${movieId}?api_key=${api_key}&language=en-US`
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch movie details');
+        }
+        const data = await response.json();
+        setMovie(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        setMovie(null);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchDetails();
+    fetchMovieDetails();
   }, [movieId]);
 
-  const date = movieDetails ? movieDetails.release_date.slice(0, 4) : '';
-
-  useEffect(() => {
-    if (location.pathname.includes('cast') || location.pathname.includes('reviews')) {
-      setSubPageVisits((prevCount) => prevCount + 1);
+  const handleGoBack = () => {
+    if (location.state?.from) {
+      navigate(location.state.from);
+    } else {
+      navigate('/movies');
     }
-  }, [location.pathname]);
-
-  const goBack = () => {
-    navigate(-1 - subPageVisits);
   };
 
-  return (
-    <div className={styles.container}>
-      <Link
-        to={location.state?.from === '/' ? '/' : '/movies'}
-        className={styles.backLink}
-        onClick={goBack}
-      >
-        Go back
-      </Link>
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!movie) return null;
 
-      {movieDetails && (
-        <div className={styles.mainDiv}>
-          <div className={styles.posterPlaceholder}>
-            {movieDetails.poster_path ? (
-              <img
-                className={styles.poster}
-                src={`https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`}
-                alt={movieDetails.title}
-                height="440px"
-              />
-            ) : (
-              <div className={styles.placeholderText}>No Poster Available</div>
-            )}
-          </div>
-          <div className={styles.info}>
-            <h1>{`${movieDetails.title} (${date})`}</h1>
-            <p>User Score: {movieDetails.vote_average}</p>
-            <h2>Overview</h2>
-            <p>{movieDetails.overview}</p>
-            <h2>Genres</h2>
-            {movieDetails.genres && (
-              <ul>
-                {movieDetails.genres.map((genre) => (
-                  <li key={genre.id}>{genre.name}</li>
-                ))}
-              </ul>
-            )}
-          </div>
+  return (
+    <div className={styles.movieBox}>
+      <button className={styles.btnBack} onClick={handleGoBack}>
+        Go Back
+      </button>
+
+      <div className={styles.details}>
+        <img
+          className={styles.poster}
+          src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+          alt={movie.title}
+        />
+        <div className={styles.info}>
+          <h2>{movie.title}</h2>
+          <p>User Score: {Math.round(movie.vote_average * 10)}%</p>
+          <h3>Overview</h3>
+          <p>{movie.overview}</p>
+          <h3>Genres</h3>
+          <p>{movie.genres.map(genre => genre.name).join(', ')}</p>
         </div>
-      )}
-      <div className={styles.linkBox}>
-        <Link className={styles.link} to={`/movies/${movieId}/cast`}>Cast</Link>
-        <Link className={styles.link} to={`/movies/${movieId}/reviews`}>Reviews</Link>
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route
-            path="/"
-            element={<Outlet />}
-          />
-          <Route path="cast" element={<Cast movieId={movieId} />} />
-          <Route path="reviews" element={<Reviews />} />
-        </Routes>
+
+      <div className={styles.additional}>
+        <h3>Additional information</h3>
+        <ul className={styles.list}>
+          <li>
+            <Link to="cast" state={{ from: location.state?.from }}>Cast</Link>
+          </li>
+          <li>
+            <Link to="reviews" state={{ from: location.state?.from }}>Reviews</Link>
+          </li>
+        </ul>
+      </div>
+
+      <Suspense fallback={<p>Loading section...</p>}>
+        <Outlet />
       </Suspense>
     </div>
   );
